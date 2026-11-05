@@ -61,13 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalCloseBtn = document.getElementById('modal-close-btn');
 
   function openModal(imgSrc, title, desc, currentBg) {
+    if (!modal || !modalImg) return;
     modalImg.src = imgSrc;
-    modalTitle.textContent = title || 'Детальный просмотр знака';
-    modalDesc.textContent = desc || '';
-    if (currentBg) {
-      modalImgBox.style.backgroundColor = currentBg;
-    } else {
-      modalImgBox.style.backgroundColor = '#06090E';
+    if (modalTitle) modalTitle.textContent = title || 'Детальный просмотр знака';
+    if (modalDesc) modalDesc.textContent = desc || '';
+    if (modalImgBox) {
+      modalImgBox.style.backgroundColor = currentBg || '#06090E';
     }
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
@@ -75,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeModal() {
+    if (!modal) return;
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
@@ -84,23 +84,26 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.zoom-trigger').forEach(trigger => {
     trigger.addEventListener('click', (e) => {
       const parent = e.target.closest('.concept-card, .deliverable-card');
+      if (!parent) return;
       const img = parent.querySelector('.card-img');
       const title = trigger.getAttribute('data-title');
       const desc = trigger.getAttribute('data-desc');
       const mediaBox = parent.querySelector('.card-media-wrapper, .deliv-media');
       const currentBg = mediaBox ? window.getComputedStyle(mediaBox).backgroundColor : '#06090E';
 
-      openModal(img.src, title, desc, currentBg);
+      if (img) openModal(img.src, title, desc, currentBg);
     });
   });
 
   // Modal close events
-  modalCloseBtn.addEventListener('click', closeModal);
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-  });
+  if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) {
+    if (e.key === 'Escape' && modal && modal.classList.contains('open')) {
       closeModal();
     }
   });
@@ -108,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Modal background toggle buttons
   document.querySelectorAll('.modal-bg-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      modalImgBox.style.backgroundColor = btn.getAttribute('data-bg');
+      if (modalImgBox) modalImgBox.style.backgroundColor = btn.getAttribute('data-bg');
     });
   });
 
